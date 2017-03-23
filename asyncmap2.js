@@ -1,7 +1,7 @@
 var async = require('async');
 var fs = require('fs');
 var gm = require('gm');
-var dir = '../Day32'
+var dir = 'images'
 
 fs.readdir(dir,function(err,data){
   if(err){
@@ -10,7 +10,7 @@ fs.readdir(dir,function(err,data){
   }
   console.log(data);
 
-  async.each(data, transform, function(err){
+  async.map(data, transform, function(err){
 
     if (err) {
       console.log(err.message);
@@ -22,7 +22,7 @@ fs.readdir(dir,function(err,data){
 
   function transform(item, callback){
 
-    CreateThumbnail(item, 'small'+item, function(err){
+    CreateThumbnail("images/"+item, 'images/small'+item, function(err){
       if (err){
         console.log(err.message);
         return;
@@ -31,22 +31,30 @@ fs.readdir(dir,function(err,data){
     })
 
     function CreateThumbnail(filename, thumbnailFilename, callback){
-
-        fs.writeFile(filename, data, function(err) {
-          if (err) {
-            callback(err);
-            return;
-          }
-
-          gm(filename).resize(240, 240).write(thumbnailFilename, function(err) {
-            if (err) {
-              console.log('IM BROKEN')
-              callback(err);
-              return;
-            }
-            callback(null);
-          });
-        });
-      }
+      gm(filename).resize(240, 240).write(thumbnailFilename, function(err) {
+        if (err) {
+          console.log('IM BROKEN')
+          callback(err);
+          return;
+        }
+        callback(null);
+      });
     }
+  }
+});
+
+
+  function transform(item, callback){
+    CreateThumbnail("images/"+item, 'images/small'+item, function(err){
+      if (err){
+        console.log(err.message);
+        return;
+      }
+      console.log('File Found')
+    })
+
+    function CreateThumbnail(filename, thumbnailFilename, callback){
+      gm(filename).resize(240, 240).write(thumbnailFilename, callback);
+    }
+  }
 });
